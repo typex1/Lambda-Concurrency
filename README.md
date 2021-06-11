@@ -27,12 +27,33 @@ Important: this application uses various AWS services and there are costs associ
     ```
     sam deploy --guided
     ```
-1. During the prompts:
-    * Enter a stack name
-    * Enter the desired AWS Region
-    * Allow SAM CLI to create IAM roles with the required permissions.
+1. Perform the following entries: 
+    ```
+    sam deploy --guided
+
+       Configuring SAM deploy
+       ======================
+
+       Looking for config file [samconfig.toml] :  Found
+       Reading default arguments  :  Success
+
+       Setting default arguments for 'sam deploy'
+       =========================================
+       Stack Name [sam-app]: sam-Lambda-Concurrency
+       AWS Region [us-east-1]:
+       #Shows you resources changes to be deployed and require a 'Y' to initiate deploy
+       Confirm changes before deploy [y/N]: y
+       #SAM needs permission to be able to create roles to connect to the resources in your template
+       Allow SAM CLI IAM role creation [Y/n]: Y
+       Save arguments to configuration file [Y/n]: Y
+       SAM configuration file [samconfig.toml]:
+       SAM configuration environment [default]:
+
+    ```
 
     Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    
+![Architecture Image](../img/concurrency-arch.png)
 
 1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
    
