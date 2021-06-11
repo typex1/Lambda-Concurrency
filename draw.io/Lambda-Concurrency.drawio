@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2021-06-11T15:28:36.541Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/14.6.13 Chrome/89.0.4389.128 Electron/12.0.7 Safari/537.36" etag="c52NvEnRnLkIBLi2qFkE" version="14.6.13" type="device">
+<mxfile host="Electron" modified="2021-06-11T15:41:42.078Z" agent="5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/14.6.13 Chrome/89.0.4389.128 Electron/12.0.7 Safari/537.36" etag="NeoLRzryX92fln1sBeuL" version="14.6.13" type="device">
   <diagram id="-In8b_gJp782xcwDJSrX" name="Lambda Concurrency">
     <mxGraphModel dx="1106" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -106,6 +106,9 @@
             <mxGeometry x="60" y="276.5" width="211" height="28" as="geometry" />
           </mxCell>
         </UserObject>
+        <mxCell id="Z18ZBfjKj5xelHkYDf2P-27" value="&lt;h1&gt;&lt;u&gt;Architecture for the Lambda Concurrency project&lt;/u&gt;&lt;/h1&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="28" y="28" width="1120" height="56" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
