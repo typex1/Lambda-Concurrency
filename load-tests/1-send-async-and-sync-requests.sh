@@ -4,10 +4,10 @@
 FUNC=Lambda-Concurrency
 
 # Synchronous invocation, like e.g. API Gateway:
-#TYPE="RequestResponse"
+TYPE="RequestResponse"
 
 # Asynchronous invocation, like e.g. S3 notificatin:
-TYPE="Event"
+#TYPE="Event"
 
 # number of invocations:
 COUNT=1
