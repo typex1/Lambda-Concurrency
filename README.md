@@ -2,7 +2,7 @@
 
 The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. SQS invokes the Lambda function when new messages are available.
 
-The deployment foundation is take from here: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda)
+The deployment foundation is taken from here: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -53,48 +53,74 @@ Important: this application uses various AWS services and there are costs associ
 
     Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
     
+## Architecture overview
+    
 ![Architecture Image](./img/concurrency-arch.png)
 
-1. Note the outputs from the SAM deployment process. These contain the resource names and/or ARNs which are used for testing.
+The architecture overview shows how you can test the three different Lambda invocation types:
+
+1. a) Asynchronous invocation: Using the script "load-tests/1-send-async-and-sync-requests.sh", we first of all send one asynchrounous event, then we check the respective entry in the CloudWatch log group. Veryfy that in the script, the variable TYPE is set to "Event". This simulates e.g. an S3 bucket notification being sent to a bucket.
+Please note that on the command line of your computer, you see something like 
    
-## Example event payload from SQS to Lambda
-
 ```
-{
-    "Records": [
-        {
-            "messageId": "fa2012345678e816-0a49-4681-ba8f-1234567890",
-            "receiptHandle": "1234567890NmjC1234567890qODTr1234567890/XPPk/f0qU4tJtQ1234567890ihWDp8YHKhDr3V1234567890e9amjZhgg1234567890RodR1234567890lwDGpf6oLa8/B/1234567890/Pq+xP/1234567890/1234567890fIV6nFUGs71234567890zsj616CBx912M12345678908rxtUEj1234567890J8d1234567890yDcI9E12345678905mTyYZ41S2cP01NCA1234567890jcalHD1234567890Kio+HFQp1234567890OI7bTs5I7pZJ4pu+BnM8Bcki1234567890aNML5B7S12345678904eYKKcrunp1234567890Qhz7BUWPG41",
-            "body": "Test message",
-            "attributes": {
-                "ApproximateReceiveCount": "1",
-                "SentTimestamp": "1612966720445",
-                "SenderId": "AIDA3DTKMG1234567890",
-                "ApproximateFirstReceiveTimestamp": "1612966720455"
-            },
-            "messageAttributes": {},
-            "md5OfBody": "82dfa5549ebc91234567890ece5f",
-            "eventSource": "aws:sqs",
-            "eventSourceARN": "arn:aws:sqs:us-east-1:123456789012:patterns-sqs-to-lambda-MySqsQueue-1234567890",
-            "awsRegion": "us-east-1"
-        }
-    ]
-}
-
-```
-### Testing
-
-Use the [AWS CLI](https://aws.amazon.com/cli/) to send a message to the SQS queue and observe the event delivered to the Lambda function:
-
-1. Send the SQS message:
-```bash
-aws sqs send-message --queue-url ENTER_YOUR_SQS_QUEUE_URL --message-body "Test message"
-```
-2. Retrieve the logs from the Lambda function:
-```bash
-sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME
+-----------------------
+|       Invoke        |
++-------------+-------+
+|  StatusCode |  202  |
++-------------+-------+
 ```
 
+once the request has been sent. This is because in this async request situation, Lambda only sends an HTTP 202 code to comfirm that the message has been received. The Lambda function itself lastst for about 3 seconds (see the sleep(3) command inside of the Lambda Code), but after having finished, Lambda sends no additional response as we are working asynchronously here.
+
+
+1. b) Synchronous invocation: in the same script as above, we now set TYPE="RequestResponse", which means that now, requests are sent synchronously to the Lambda function, just like e.g. API Gateway would do it. After the AWS CLI has taken place and sent to the background, it takes around 3 seconds until Lambda returns  
+
+```
+-----------------------------------
+|             Invoke              |
++------------------+--------------+
+|  ExecutedVersion | StatusCode   |
++------------------+--------------+
+|  $LATEST         |  200         |
++------------------+--------------+
+```
+
+So this response is based upon the finalization of the Lambda function process.
+
+
+2. Polling: the last variant is the one where a Lambda function has an SQS queue attached to it as a trigger source. Remember that SQS queues, following the typical queue pattern, do not actively send data to consumers. Instead, consumers need to poll the queue for new messages, and that is exactly what Lambda is doing. As a first test, we invoke "load-tests/2-send-message-to-queue.sh" which sends one single message to the queue, containing a random number to identify different messages, apart from their messageId. As a result on the command line, we see something like this:
+
+```
+------------------------------------------------------------------------------
+|                                 SendMessage                                |
++-----------------------------------+----------------------------------------+
+|         MD5OfMessageBody          |               MessageId                |
++-----------------------------------+----------------------------------------+
+|  75db4515985089778baca77b6de0f32c |  b228f308-60a6-4f92-b921-8454c46552c4  |
++-----------------------------------+----------------------------------------+
+```
+
+This clarifies that the queue has accepted the message. As can be seen in CloudWatch logs, Lambda is immediately fetching the message from the queue and makes an entry in the log group.
+
+### Now let's send more than 1 request at once!
+
+So you might wonder where we see concurrency here? Well, so far we have done some preliminary work to understand the test setup.
+
+Let's go into the case 1 a) first, so the async one. Set TYPE back to "Event" to switch on async processing. Then change COUNT from 1 to e.g. 10. This fires 10 async requests against Lambda. After having done that, you get 10 HTTP 202 confirmations on your command line, one for each invocation. On the cloudWatch side, you see around 10 new log streams - because Lambda was not able to handle the requests sequentially, they have been sent too fast. The fact that we have around 10 new log streams shows us that behind the scenes, 10 Lambda function instances have been running in parallel.
+
+The same is true for case 1 b), if you set TYPE again to "RequestResponse".
+
+If we look at case 2) and set accordingly the variable COUNT=20 in script "load-tests/2-send-message-to-queue.sh", we see that 10 queue entries are confirmed on the command line, each with a different messageId. But if we look into CloudWatch logs, Lambda has written only to something like 2 log streams. Why is that? That is because if you look at the Lambda settings here:
+
+![Lambda Trigger Settings](./img/trigger-settings.png)
+
+You see that BatchSize is set to 10. That means that within one step, Lambda fetches 10 messages from the qeue at once, and this batch is processed in one single Lambda instance, which means that we equally see Lambda writing to only around 2 log streams. "Around two log streams" because it might occur that due to performance reasons, the number of messages per log stream might be sometimes smaller than 10.
+
+### And now let us set a reserved concurrency value!
+
+### Test strategy
+
+Technically, this setup is done as simple as possible. That is, instead of using a sophisticated test tool, we simply use bash scripts to invoke a sequence of AWS CLI commands either sending test requests to Lambda directly or creating messages in an SQS queue. To enable quasi-parallel request creation, we send the AWS CLI commands to the background after they have been created, which enables us to create well above 100 requests per second which is fully sufficient here.
 
 ## Cleanup
  
@@ -107,6 +133,5 @@ sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME
     aws cloudformation list-stacks --query "StackSummaries[?contains(StackName,'STACK_NAME')].StackStatus"
     ```
 ----
-Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 SPDX-License-Identifier: MIT-0
