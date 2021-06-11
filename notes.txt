@@ -1,0 +1,1 @@
+example template source: https://github.com/aws-samples/serverless-patterns/tree/main/sqs-lambda

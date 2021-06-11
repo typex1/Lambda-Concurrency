@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "sam-Lambda-Concurrency"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-5a5gn8y9wvu4"
+s3_prefix = "sam-Lambda-Concurrency"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"

@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless patterns - SQS to Lambda
+
+Resources:
+  # Define the SQS queue
+  # details see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-sqs-queues.html
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: LambdaInputQueue
+
+  # Define the consumer Lambda function
+  # details see https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+  QueueConsumerFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: Lambda-Concurrency
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.8
+      Timeout: 15
+      MemorySize: 128
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+          # details see https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-sqs.html
+            Queue: !GetAtt MySqsQueue.Arn
+            BatchSize: 10
+            MaximumBatchingWindowInSeconds: 1
+Outputs:
+  QueueConsumerFunction:
+    Description: QueueConsumerFunction function name
+    Value: !Ref QueueConsumerFunction
+  
+  SQSqueueName:
+    Description: SNS queue name
+    Value: !GetAtt MySqsQueue.QueueName
+
+  SQSqueueARN:
+    Description: SQS queue ARN
+    Value: !GetAtt MySqsQueue.Arn
+
+  SQSqueueURL:
+    Description: SQS queue URL
+    Value: !Ref MySqsQueue
