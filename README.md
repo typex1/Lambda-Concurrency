@@ -1,8 +1,8 @@
-# Amazon SQS to AWS Lambda
+# Lambda Concurrency tests based on simple AWS CLI invocations
 
 The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. SQS invokes the Lambda function when new messages are available.
 
-Learn more about this pattern at Serverless Land Patterns: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda)
+The deployment foundation is take from here: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda)
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
 
@@ -17,11 +17,11 @@ Important: this application uses various AWS services and there are costs associ
 
 1. Create a new directory, navigate to that directory in a terminal and clone the GitHub repository:
     ``` 
-    git clone https://github.com/aws-samples/serverless-patterns
+    git clone (this repo URL)
     ```
 1. Change directory to the pattern directory:
     ```
-    cd sqs-lambda
+    cd Lambda-Concurrency
     ```
 1. From the command line, use AWS SAM to deploy the AWS resources for the pattern as specified in the template.yml file:
     ```
@@ -79,7 +79,7 @@ sam logs -n ENTER_YOUR_CONSUMER_FUNCTION_NAME
  
 1. Delete the stack
     ```bash
-    aws cloudformation delete-stack --stack-name STACK_NAME
+    ./delete-stack.sh
     ```
 1. Confirm the stack has been deleted
     ```bash
