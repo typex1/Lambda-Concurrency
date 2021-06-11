@@ -114,9 +114,19 @@ If we look at case 2) and set accordingly the variable COUNT=20 in script "load-
 
 ![Lambda Trigger Settings](./img/trigger-settings.png)
 
-You see that BatchSize is set to 10. That means that within one step, Lambda fetches 10 messages from the qeue at once, and this batch is processed in one single Lambda instance, which means that we equally see Lambda writing to only around 2 log streams. "Around two log streams" because it might occur that due to performance reasons, the number of messages per log stream might be sometimes smaller than 10.
+You see that BatchSize is set to 10. That means that within one step, Lambda fetches 10 messages from the queue at once, and this batch is processed in one single Lambda instance, which means that we equally see Lambda writing to only around 2 log streams. "Around two log streams" because it might occur that due to performance reasons, the number of messages per log stream might be sometimes smaller than 10.
 
 ### And now let us set a reserved concurrency value!
+
+If we go into the Lambda Function Configuration settings in the AWS Management Console, and into "Concurrency", under Concurrency - Edit we can set e.g. the Reserved Concurrency to 5. This means that from our default 1000 parallel Lambda invocations per Region, we now have reserved 5 for this Lambda function.
+
+What does this mean for our 3 different invocation types?
+
+For type 1 a) async invocation: at first, we would not see any difference, all 10 requests are processed. Why? Because Lambda makes use of an internal queue which is storing invokations that go beyond 5 requests in parallel.
+
+For type 1 b) synchronous invocations, we get 5 positive responses (HTTP 200), and 5 negative ones (HTTP 429 = TooManyRequests), because here Lambda throttles the requests which exceed the Reserved Concurrency value.
+
+For type 2 which is SQS based invocations, we do not see any consequenses either, because again Lambda stores messages which go beyond the Reserved Concurrency value in an internal queue.
 
 ### Test strategy
 
