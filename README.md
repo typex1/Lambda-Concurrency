@@ -34,8 +34,7 @@ Important: this application uses various AWS services and there are costs associ
        Configuring SAM deploy
        ======================
 
-       Looking for config file [samconfig.toml] :  Found
-       Reading default arguments  :  Success
+       Looking for config file [samconfig.toml] :  Not found
 
        Setting default arguments for 'sam deploy'
        =========================================
