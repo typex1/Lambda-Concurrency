@@ -1,6 +1,6 @@
 # Lambda Concurrency tests based on simple AWS CLI invocations
 
-The SAM template deploys a Lambda function, an SQS queue and the IAM permissions required to run the application. SQS invokes the Lambda function when new messages are available.
+The SAM template deploys a Lambda function, an SQS queue which acts as a trigger and the IAM permissions required to run the application. SQS invokes the Lambda function when new messages are available.
 
 The deployment foundation is taken from here: [serverlessland.com/patterns/sql-lambda](https://serverlessland.com/patterns/sqs-lambda)
 
@@ -50,7 +50,7 @@ Important: this application uses various AWS services and there are costs associ
 
     ```
 
-    Once you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
+    If you have run `sam deploy -guided` mode once and saved arguments to a configuration file (samconfig.toml), you can use `sam deploy` in future to use these defaults.
     
 ## Architecture overview
     
