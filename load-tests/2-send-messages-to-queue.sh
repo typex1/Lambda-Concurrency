@@ -11,7 +11,7 @@ QUEUE_URL=$(aws sqs get-queue-url --queue-name ${QUEUE_NAME} --output json | awk
 #aws sqs get-queue-attributes --queue-url ${QUEUE_URL} --region us-east-1 --attribute-names All
 
 # number of messages sent to the queue:
-COUNT=1
+COUNT=100
 
 for i in `seq 1 ${COUNT}`
 do
