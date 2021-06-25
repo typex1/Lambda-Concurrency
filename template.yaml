@@ -22,6 +22,7 @@ Resources:
       Runtime: python3.8
       Timeout: 15
       MemorySize: 128
+      ReservedConcurrentExecutions: 5
       Events:
         MySQSEvent:
           Type: SQS
