@@ -58,7 +58,7 @@ Important: this application uses various AWS services and there are costs associ
 
 The architecture overview shows how you can test the three different Lambda invocation types:
 
-1. a) Asynchronous invocation: Using the script "load-tests/1-send-async-and-sync-requests.sh", we first of all send one asynchrounous event, then we check the respective entry in the CloudWatch log group. Veryfy that in the script, the variable TYPE is set to "Event". This simulates e.g. an S3 bucket notification being sent to a bucket.
+1. a) Asynchronous invocation: Using the script "load-tests/1-send-async-and-sync-requests.sh", we first of all send one asynchrounous event, then we check the respective entry in the CloudWatch log group. Verify that in the script, the variable TYPE is set to "Event". This simulates e.g. an S3 bucket notification being sent to a bucket.
 Please note that on the command line of your computer, you see something like 
    
 ```
