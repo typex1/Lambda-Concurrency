@@ -12,13 +12,13 @@ def lambda_handler(event, context):
         if 'body' in event_contents:
             for record in records:
                 body = record['body']
-        
+                print('body: {}'.format(body))
                 #$RANDOM: random integer in range 0 to 32767 (half of it: 16383)
         
                 ##############
                 # uncomment the next 3 lines if you want to test how Lambda handles SQS messages which cause an error:
-                # value=int((body.split()[2]))
-                # if value > 214230:
+                #value=int((body.split()[2]))
+                #if value > 21423:
                 #    raise ValueError('value {} too high'.format(value)) 
                 ##############
         
