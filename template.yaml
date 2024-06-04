@@ -19,7 +19,7 @@ Resources:
       Description: Lambda Concurrency test function
       CodeUri: src/
       Handler: lambda_function.lambda_handler
-      Runtime: python3.8
+      Runtime: python3.12
       Timeout: 15
       MemorySize: 128
       ReservedConcurrentExecutions: 5
